@@ -1,4 +1,19 @@
-.welcome-card ion-img {
-  max-height: 35vh;
-  overflow: hidden;
+.logo-line{
+  display: flex;
+  justify-content: center;
+  margin: 10px;
+}
+
+#logo{
+  height: 8rem;
+}
+
+.common-text{
+  margin-left: 15px;
+  margin-bottom: 15px;
+  display: block;
+}
+
+.button-update{
+  margin-top: 15px;
 }
