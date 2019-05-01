@@ -13,6 +13,10 @@
   <ion-card class="card-purple">
     <ion-card-content>
       <p class="title-card-section" *ngIf="firstAccess">Boas vindas!</p>
+      <ion-row justify-content-center>
+        <img class="tooth-image" src="/assets/tooth.png" *ngIf="accessProgress == 0"/>
+        <img class="tooth-image" src="/assets/open-mouth.png"*ngIf="accessProgress > 0"/>
+      </ion-row>
       <span *ngIf="accessProgress == 0">
           Se você está usando este aplicativo é porque você foi diagnosticado com
           Disfunção temporomandibular, mas não se preocupe, nós vamos te ajudar. O
