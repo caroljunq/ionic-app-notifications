@@ -1,0 +1,21 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>
+      Criação e Apoio
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-card class="card-purple">
+    <ion-card-content>
+      <p *ngFor="let author of authors">
+        <span> {{ author.type }} </span>
+        <span> {{ author.names }} </span>
+      </p>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

@@ -1,0 +1,56 @@
+<ion-header *ngIf="!firstAccess">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>
+      Sobre o app
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-card class="card-purple">
+    <ion-card-content>
+      <p class="title-card-section" *ngIf="firstAccess">Boas vindas!</p>
+      <span *ngIf="accessProgress == 0">
+          Se você está usando este aplicativo é porque você foi diagnosticado com
+          Disfunção temporomandibular, mas não se preocupe, nós vamos te ajudar. O
+          Sistema Estomatognático é o conjunto de órgãos e tecidos responsáveis pela
+          fala, mastigação, e estética e envolve dentes, língua, bochechas e tudo que
+          você precisa para falar, mastigar e sorrir são suas principais funções. Agora
+          nós vamos te aconselhar com dicas para você sentir menos dor.
+      </span>
+      <span *ngIf="accessProgress == 3">
+          A disfunção é quano a dor acontece durante a fala, mastigação ou ao sorrir. Apertar
+          os dentes e esfregá-los sem necessidade é um hábito que vai forçar seu Sistema Estomatognático,
+          então sempre que perceber que você está fazendo isso procure desencostar os dentes e manter as bochechas
+          relaxadas, mas não estique demais a musculatura.
+      </span>
+      <span *ngIf="accessProgress == 2">
+          A Parafunção quando se mantém por muito tempo machuca os órgãos e tecidos que fazem parte do nosso Sistema
+          Estomatognático, como por exemplo: os dentes ficam desgastados, os músculos ficam cansados e doloridos e a Articulação Temporomandibular
+          (que fica na frente do seu ouvido) fica desgastada, barulhenta e muitas vezes dói.
+      </span>
+      <span *ngIf="accessProgress == 1">
+        Utilizar os músculos de maneira exagerada, como por exemplo, esfregando os dentes uns aos outros ou apertando
+        os dentes uns aos outros de forma desnecessária, força a capacidade do seu Sistema, chama-se de Parafunção.
+      </span>
+      <ion-row justify-content-center>
+        <ion-button class="step-access" fill="clear" size="default" (click)="backAccessProgress()" *ngIf="accessProgress > 0">
+          <ion-icon slot="start" name="arrow-back"></ion-icon>
+          <span>Voltar</span>
+        </ion-button>
+        <ion-button class="step-access" fill="clear" size="default" (click)="startApp()" *ngIf="accessProgress >= 3">
+          <span *ngIf="firstAccess">Começar</span>
+          <span *ngIf="!firstAccess">Início</span>
+          <ion-icon slot="end" name="arrow-forward"></ion-icon>
+        </ion-button>
+        <ion-button class="step-access" fill="clear" size="default" (click)="forwardAccessProgress()" *ngIf="accessProgress < 3">
+          <span>Continuar</span>
+          <ion-icon slot="end" name="arrow-forward"></ion-icon>
+        </ion-button>
+      </ion-row>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

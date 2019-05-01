@@ -9,3 +9,80 @@
 @import '~@ionic/angular/css/text-alignment.css';
 @import '~@ionic/angular/css/text-transformation.css';
 @import '~@ionic/angular/css/flex-utils.css';
+
+:root {
+  --primary-color: #0984e2;
+}
+
+#close-menu-button{
+  color: white;
+  text-align: center;
+  font-size: 2rem;
+  padding-left: 7px;
+}
+
+.card-purple{
+
+  width: 100% !important;
+  margin: 60px 0 !important;
+  border: none;
+
+  ion-card-content{
+    background: var(--primary-color);
+    padding: 45px 15px 6px 15px;
+    color: white;
+    text-align: center;
+    font-size: 1rem;
+
+    .title-card-section{
+      font-weight: 600;
+      font-size: 1.2rem;
+      margin-bottom: 15px;
+    }
+
+    p{
+      text-align: center;
+      color: white;
+      margin-bottom: 19px;
+      font-size: 1rem;
+
+      span:nth-child(1){
+        display: block;
+        font-size: 1.1rem;
+        font-weight: 600;
+      }
+
+      a,span:nth-child(2){
+        color: white;
+        // font-size: 1.1rem;
+        text-decoration: none;
+      }
+    }
+  }
+}
+
+ion-toolbar{
+  text-transform: uppercase;
+  color: white;
+  --background: var(--primary-color);
+}
+
+ion-toolbar > ion-title{
+  font-size: 1rem;
+}
+
+.menu-item{
+  color: #064fab !important;
+}
+
+ion-menu {
+  ion-header{
+    background: var(--primary-color);
+    padding: 5px;
+    color: white;
+  }
+}
+
+.menu-title{
+  font-size: 1.1rem !important;
+}
