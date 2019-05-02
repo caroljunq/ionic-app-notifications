@@ -61,6 +61,7 @@ export class HomePage {
     });
   }
 
+  // Generate random data (hour minute) out of the range of wake-sleep hour
   getRandomDate() {
     let wakeHour = this.wakeHour.split(':');
     let sleepHour = this.sleepHour.split(':');
