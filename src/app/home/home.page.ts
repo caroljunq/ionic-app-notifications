@@ -104,10 +104,9 @@ export class HomePage {
         id: index,
         title: 'Dica',
         text: message,
-        trigger: { every: { hour: randomDate.getHours(), minute: randomDate.getMinutes()}},
+        trigger: { every: { hour: randomDate.getHours(), minute: randomDate.getMinutes(), second: 1}, count: 1},
         // actions: [
-        //   { id: 'yes', title: 'OK' },
-        //   { id: 'no',  title: 'No' }
+        //   { id: 'ok', title: 'OK' },
         // ]
       });  
     });
@@ -123,10 +122,9 @@ export class HomePage {
       id: count++,
       title: 'Dica',
       text: "Não durma com o queixo apoiado nas mãos.",
-      trigger: { every: { hour: sleepDate.getHours(), minute: sleepDate.getMinutes()}},
+      trigger: { every: { hour: sleepDate.getHours(), minute: sleepDate.getMinutes(), second: 1}, count: 1},
       // actions: [
-      //   { id: 'yes', title: 'OK' },
-      //   { id: 'no',  title: 'No' }
+      //   { id: 'ok', title: 'OK' },
       // ]
     })
 
@@ -135,10 +133,9 @@ export class HomePage {
       id: count++,
       title: 'Dica',
       text: "Evite alimentos duros na hora das refeições caso esteja com dor.",
-      trigger: { every: { hour: lunchDate.getHours(), minute: lunchDate.getMinutes()}},
+      trigger: { every: { hour: lunchDate.getHours(), minute: lunchDate.getMinutes(), second: 1}, count: 1},
       // actions: [
-      //   { id: 'yes', title: 'OK' },
-      //   { id: 'no',  title: 'No' }
+      //   { id: 'ok', title: 'OK' },
       // ]
     })
 
@@ -147,7 +144,7 @@ export class HomePage {
 
   async presentAlert(msg){
     let alert = await this.alertCtrl.create({
-      header: 'Atualização.',
+      // header: 'Atualização',
       message: msg,
       buttons: ['Ok']
     });

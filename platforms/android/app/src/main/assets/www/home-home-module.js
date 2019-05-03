@@ -203,7 +203,7 @@ var HomePage = /** @class */ (function () {
                                     id: index,
                                     title: 'Dica',
                                     text: message,
-                                    trigger: { every: { hour: randomDate.getHours(), minute: randomDate.getMinutes() } },
+                                    trigger: { every: { hour: randomDate.getHours(), minute: randomDate.getMinutes(), second: 1 }, count: 1 },
                                 });
                             })];
                     case 2:
@@ -218,14 +218,14 @@ var HomePage = /** @class */ (function () {
                             id: count++,
                             title: 'Dica',
                             text: "Não durma com o queixo apoiado nas mãos.",
-                            trigger: { every: { hour: sleepDate.getHours(), minute: sleepDate.getMinutes() } },
+                            trigger: { every: { hour: sleepDate.getHours(), minute: sleepDate.getMinutes(), second: 1 }, count: 1 },
                         });
                         // 30 min before lunch
                         notifications.push({
                             id: count++,
                             title: 'Dica',
                             text: "Evite alimentos duros na hora das refeições caso esteja com dor.",
-                            trigger: { every: { hour: lunchDate.getHours(), minute: lunchDate.getMinutes() } },
+                            trigger: { every: { hour: lunchDate.getHours(), minute: lunchDate.getMinutes(), second: 1 }, count: 1 },
                         });
                         return [4 /*yield*/, this.localNotifications.schedule(notifications)];
                     case 3: return [2 /*return*/, _a.sent()];
@@ -239,7 +239,7 @@ var HomePage = /** @class */ (function () {
             return tslib__WEBPACK_IMPORTED_MODULE_0__["__generator"](this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.alertCtrl.create({
-                            header: 'Atualização.',
+                            // header: 'Atualização',
                             message: msg,
                             buttons: ['Ok']
                         })];
