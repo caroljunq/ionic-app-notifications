@@ -229,7 +229,7 @@ var HomePage = /** @class */ (function () {
                                 id: i,
                                 title: 'Dica',
                                 text: randomMessages[i],
-                                trigger: { every: { hour: hours[i][0], minute: hours[i][1], second: 1 }, count: 1 },
+                                trigger: { every: { hour: hours[i][0], minute: hours[i][1], second: 1 }, count: 365 },
                             });
                         }
                         //if there are more available hours than messages
@@ -239,7 +239,7 @@ var HomePage = /** @class */ (function () {
                                     id: i,
                                     title: 'Dica',
                                     text: randomMessages[this.getRandomArbitrary(0, randomMessages.length - 1)],
-                                    trigger: { every: { hour: hours[i][0], minute: hours[i][1], second: 1 }, count: 1 },
+                                    trigger: { every: { hour: hours[i][0], minute: hours[i][1], second: 1 }, count: 365 },
                                 });
                             }
                         }
@@ -254,14 +254,14 @@ var HomePage = /** @class */ (function () {
                             id: arraySize + 1,
                             title: 'Dica',
                             text: "Não durma com o queixo apoiado nas mãos.",
-                            trigger: { every: { hour: sleepDate.getHours(), minute: sleepDate.getMinutes(), second: 1 }, count: 1 },
+                            trigger: { every: { hour: sleepDate.getHours(), minute: sleepDate.getMinutes(), second: 1 }, count: 365 },
                         });
                         // 30 min before lunch
                         notifications.push({
                             id: arraySize + 2,
                             title: 'Dica',
                             text: "Evite alimentos duros na hora das refeições caso esteja com dor.",
-                            trigger: { every: { hour: lunchDate.getHours(), minute: lunchDate.getMinutes(), second: 1 }, count: 1 },
+                            trigger: { every: { hour: lunchDate.getHours(), minute: lunchDate.getMinutes(), second: 1 }, count: 365 },
                         });
                         return [4 /*yield*/, this.localNotifications.schedule(notifications)];
                     case 2: return [2 /*return*/, _a.sent()];
