@@ -106,6 +106,11 @@ var HomePage = /** @class */ (function () {
         this.wakeHour = "00:00";
         this.sleepHour = "00:00";
         this.breakfastHour = "00:00";
+        this.messages_no_restrictions = ["Evite manter os dentes encostados uns aos outros", "Não esfregue os dentes uns aos outros", "Evite morder seus lábios",
+            "Não roa unhas", "Evite Mascar Chicletes", "Evite apoiar a mão no queixo", "Evite Segurar o telefone nas orelhas com o ombro",
+            "Evite morder canetas, alfinetes, ou abrir coisas com os dentes", "Não chupe o próprio dedo ou chupeta",
+            "Não chupe a própria língua"
+        ];
         this.storage.get('firstAccess').then(function (firstAccess) {
             if (firstAccess == null || firstAccess) {
                 _this.router.navigateByUrl('/about');
@@ -138,39 +143,104 @@ var HomePage = /** @class */ (function () {
             }
         });
     }
-    HomePage.prototype.confirmUpdate = function () {
-        this.storage.set('lunch', this.lunchHour);
-        this.storage.set('dinner', this.dinnerHour);
-        this.storage.set('wake', this.wakeHour);
-        this.storage.set('sleep', this.sleepHour);
-        this.storage.set('breakHour', this.breakfastHour);
-        //seta novos schedules de notificacao
-        this.setNewNotifications();
-        this.presentAlert();
+    // Generate random data (hour minute) out of the range of wake-sleep hour
+    HomePage.prototype.getRandomDate = function () {
+        var wakeHour = this.wakeHour.split(':');
+        var sleepHour = this.sleepHour.split(':');
+        var today = new Date();
+        var from = new Date(new Date(today.getFullYear(), today.getMonth(), today.getDate(), parseInt(wakeHour[0]), parseInt(wakeHour[1]), 0).getTime() + 1 * 60000);
+        var to = new Date(new Date(today.getFullYear(), today.getMonth(), today.getDate(), parseInt(sleepHour[0]), parseInt(sleepHour[1]), 0).getTime() - 1 * 60000);
+        // get time string 23:40:23, then get just the 23:40
+        // let randomDate = new Date(from.getTime() + Math.random() * (to.getTime() - from.getTime())).toTimeString().split(' ')[0].split(":");
+        // return 23:40
+        // return randomDate[0] + ':' + randomDate[1];
+        return new Date(from.getTime() + Math.random() * (to.getTime() - from.getTime()));
     };
-    HomePage.prototype.setNewNotifications = function () {
+    HomePage.prototype.confirmUpdate = function () {
         return tslib__WEBPACK_IMPORTED_MODULE_0__["__awaiter"](this, void 0, void 0, function () {
+            var v1, v2, v3, v4, v5, settingNotif;
             return tslib__WEBPACK_IMPORTED_MODULE_0__["__generator"](this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.localNotifications.schedule({
-                            id: 1,
-                            text: 'Single ILocalNotification',
-                        })];
+                    case 0: return [4 /*yield*/, this.storage.set('lunch', this.lunchHour)];
                     case 1:
-                        _a.sent();
+                        v1 = _a.sent();
+                        return [4 /*yield*/, this.storage.set('dinner', this.dinnerHour)];
+                    case 2:
+                        v2 = _a.sent();
+                        return [4 /*yield*/, this.storage.set('wake', this.wakeHour)];
+                    case 3:
+                        v3 = _a.sent();
+                        return [4 /*yield*/, this.storage.set('sleep', this.sleepHour)];
+                    case 4:
+                        v4 = _a.sent();
+                        return [4 /*yield*/, this.storage.set('breakHour', this.breakfastHour)];
+                    case 5:
+                        v5 = _a.sent();
+                        return [4 /*yield*/, this.setNewNotifications()];
+                    case 6:
+                        settingNotif = _a.sent();
+                        this.presentAlert('Horários foram salvos.');
                         return [2 /*return*/];
                 }
             });
         });
     };
-    HomePage.prototype.presentAlert = function () {
+    HomePage.prototype.setNewNotifications = function () {
+        return tslib__WEBPACK_IMPORTED_MODULE_0__["__awaiter"](this, void 0, void 0, function () {
+            var clearAll, notifications, count, creating, lunchString, sleepString, today, lunchDate, sleepDate;
+            var _this = this;
+            return tslib__WEBPACK_IMPORTED_MODULE_0__["__generator"](this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.localNotifications.clearAll()];
+                    case 1:
+                        clearAll = _a.sent();
+                        notifications = [];
+                        count = 0;
+                        return [4 /*yield*/, this.messages_no_restrictions.forEach(function (message, index) {
+                                count = index + 1;
+                                var randomDate = _this.getRandomDate();
+                                notifications.push({
+                                    id: index,
+                                    title: 'Dica',
+                                    text: message,
+                                    trigger: { every: { hour: randomDate.getHours(), minute: randomDate.getMinutes() } },
+                                });
+                            })];
+                    case 2:
+                        creating = _a.sent();
+                        lunchString = this.lunchHour.split(':');
+                        sleepString = this.sleepHour.split(':');
+                        today = new Date();
+                        lunchDate = new Date(new Date(today.getFullYear(), today.getMonth(), today.getDate(), parseInt(lunchString[0]), parseInt(lunchString[1]), 0).getTime() - 30 * 60000);
+                        sleepDate = new Date(new Date(today.getFullYear(), today.getMonth(), today.getDate(), parseInt(sleepString[0]), parseInt(sleepString[1]), 0).getTime() - 30 * 60000);
+                        // 30 min before sleep
+                        notifications.push({
+                            id: count++,
+                            title: 'Dica',
+                            text: "Não durma com o queixo apoiado nas mãos.",
+                            trigger: { every: { hour: sleepDate.getHours(), minute: sleepDate.getMinutes() } },
+                        });
+                        // 30 min before lunch
+                        notifications.push({
+                            id: count++,
+                            title: 'Dica',
+                            text: "Evite alimentos duros na hora das refeições caso esteja com dor.",
+                            trigger: { every: { hour: lunchDate.getHours(), minute: lunchDate.getMinutes() } },
+                        });
+                        return [4 /*yield*/, this.localNotifications.schedule(notifications)];
+                    case 3: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
+    };
+    HomePage.prototype.presentAlert = function (msg) {
         return tslib__WEBPACK_IMPORTED_MODULE_0__["__awaiter"](this, void 0, void 0, function () {
             var alert;
             return tslib__WEBPACK_IMPORTED_MODULE_0__["__generator"](this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.alertCtrl.create({
                             header: 'Atualização.',
-                            message: 'Horários foram salvos.',
+                            message: msg,
                             buttons: ['Ok']
                         })];
                     case 1:

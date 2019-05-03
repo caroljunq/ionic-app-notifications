@@ -87,23 +87,30 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _ionic_storage__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @ionic/storage */ "./node_modules/@ionic/storage/fesm5/ionic-storage.js");
 /* harmony import */ var _angular_router__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @angular/router */ "./node_modules/@angular/router/fesm5/router.js");
 /* harmony import */ var _ionic_angular__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @ionic/angular */ "./node_modules/@ionic/angular/dist/fesm5.js");
+/* harmony import */ var _ionic_native_local_notifications_ngx__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @ionic-native/local-notifications/ngx */ "./node_modules/@ionic-native/local-notifications/ngx/index.js");
 
 
 
 
 
-// import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
+
 var HomePage = /** @class */ (function () {
-    function HomePage(storage, router, alertCtrl) {
+    function HomePage(storage, router, alertCtrl, localNotifications) {
         var _this = this;
         this.storage = storage;
         this.router = router;
         this.alertCtrl = alertCtrl;
+        this.localNotifications = localNotifications;
         this.lunchHour = "00:00";
         this.dinnerHour = "00:00";
         this.wakeHour = "00:00";
         this.sleepHour = "00:00";
         this.breakfastHour = "00:00";
+        this.messages_no_restrictions = ["Evite manter os dentes encostados uns aos outros", "Não esfregue os dentes uns aos outros", "Evite morder seus lábios",
+            "Não roa unhas", "Evite Mascar Chicletes", "Evite apoiar a mão no queixo", "Evite Segurar o telefone nas orelhas com o ombro",
+            "Evite morder canetas, alfinetes, ou abrir coisas com os dentes", "Não chupe o próprio dedo ou chupeta",
+            "Não chupe a própria língua"
+        ];
         this.storage.get('firstAccess').then(function (firstAccess) {
             if (firstAccess == null || firstAccess) {
                 _this.router.navigateByUrl('/about');
@@ -136,22 +143,52 @@ var HomePage = /** @class */ (function () {
             }
         });
     }
+    // Generate random data (hour minute) out of the range of wake-sleep hour
+    HomePage.prototype.getRandomDate = function () {
+        var wakeHour = this.wakeHour.split(':');
+        var sleepHour = this.sleepHour.split(':');
+        var today = new Date();
+        var from = new Date(new Date(today.getFullYear(), today.getMonth(), today.getDate(), parseInt(wakeHour[0]), parseInt(wakeHour[1]), 0).getTime() + 1 * 60000);
+        var to = new Date(new Date(today.getFullYear(), today.getMonth(), today.getDate(), parseInt(sleepHour[0]), parseInt(sleepHour[1]), 0).getTime() - 1 * 60000);
+        // get time string 23:40:23, then get just the 23:40
+        var randomDate = new Date(from.getTime() + Math.random() * (to.getTime() - from.getTime())).toTimeString().split(' ')[0].split(":");
+        // return 23:40
+        return randomDate[0] + ':' + randomDate[1];
+    };
     HomePage.prototype.confirmUpdate = function () {
         this.storage.set('lunch', this.lunchHour);
         this.storage.set('dinner', this.dinnerHour);
         this.storage.set('wake', this.wakeHour);
         this.storage.set('sleep', this.sleepHour);
         this.storage.set('breakHour', this.breakfastHour);
-        this.presentAlert();
+        //seta novos schedules de notificacao
+        this.setNewNotifications();
+        this.presentAlert("deubao");
     };
-    HomePage.prototype.presentAlert = function () {
+    HomePage.prototype.setNewNotifications = function () {
+        var _this = this;
+        this.presentAlert("enrei");
+        this.localNotifications.schedule({
+            id: 22,
+            title: 'Recurring',
+            text: 'Simons Recurring Notification',
+            trigger: { every: _ionic_native_local_notifications_ngx__WEBPACK_IMPORTED_MODULE_5__["ELocalNotificationTriggerUnit"].MINUTE }
+        });
+        this.localNotifications.on('trigger')
+            .subscribe(function (notification) {
+            _this.presentAlert("trigerou");
+        });
+        // return await this.localNotifications.clearAll();
+        // clearAll
+    };
+    HomePage.prototype.presentAlert = function (msg) {
         return tslib__WEBPACK_IMPORTED_MODULE_0__["__awaiter"](this, void 0, void 0, function () {
             var alert;
             return tslib__WEBPACK_IMPORTED_MODULE_0__["__generator"](this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.alertCtrl.create({
                             header: 'Atualização.',
-                            message: 'Horários foram salvos.',
+                            message: msg,
                             buttons: ['Ok']
                         })];
                     case 1:
@@ -168,7 +205,10 @@ var HomePage = /** @class */ (function () {
             template: __webpack_require__(/*! ./home.page.html */ "./src/app/home/home.page.html"),
             styles: [__webpack_require__(/*! ./home.page.scss */ "./src/app/home/home.page.scss")]
         }),
-        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [_ionic_storage__WEBPACK_IMPORTED_MODULE_2__["Storage"], _angular_router__WEBPACK_IMPORTED_MODULE_3__["Router"], _ionic_angular__WEBPACK_IMPORTED_MODULE_4__["AlertController"]])
+        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [_ionic_storage__WEBPACK_IMPORTED_MODULE_2__["Storage"],
+            _angular_router__WEBPACK_IMPORTED_MODULE_3__["Router"],
+            _ionic_angular__WEBPACK_IMPORTED_MODULE_4__["AlertController"],
+            _ionic_native_local_notifications_ngx__WEBPACK_IMPORTED_MODULE_5__["LocalNotifications"]])
     ], HomePage);
     return HomePage;
 }());

@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { Storage } from '@ionic/storage';
 import { Router } from '@angular/router';
 import { AlertController } from '@ionic/angular';
-import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
+import { LocalNotifications, ELocalNotificationTriggerUnit } from '@ionic-native/local-notifications/ngx';
 
 @Component({
   selector: 'app-home',
@@ -17,7 +17,12 @@ export class HomePage {
   sleepHour: any = "00:00";
   breakfastHour: any = "00:00";
 
-
+  messages_no_restrictions = ["Evite manter os dentes encostados uns aos outros","Não esfregue os dentes uns aos outros","Evite morder seus lábios",
+    "Não roa unhas", "Evite Mascar Chicletes","Evite apoiar a mão no queixo", "Evite Segurar o telefone nas orelhas com o ombro",
+    "Evite morder canetas, alfinetes, ou abrir coisas com os dentes", "Não chupe o próprio dedo ou chupeta",
+    "Não chupe a própria língua"
+  ]
+  
   constructor(
     private storage: Storage,
     private router: Router,
@@ -66,42 +71,86 @@ export class HomePage {
     let wakeHour = this.wakeHour.split(':');
     let sleepHour = this.sleepHour.split(':');
     let today = new Date();
-    var from = new Date (new Date(today.getFullYear(), today.getMonth(), today.getDate(), parseInt(wakeHour[0]), parseInt(wakeHour[1]), 0).getTime() + 1* 60000)
-    var to =  new Date (new Date(today.getFullYear(), today.getMonth(), today.getDate(), parseInt(sleepHour[0]), parseInt(sleepHour[1]), 0).getTime() - 1* 60000)
+    let from = new Date (new Date(today.getFullYear(), today.getMonth(), today.getDate(), parseInt(wakeHour[0]), parseInt(wakeHour[1]), 0).getTime() + 1* 60000)
+    let to =  new Date (new Date(today.getFullYear(), today.getMonth(), today.getDate(), parseInt(sleepHour[0]), parseInt(sleepHour[1]), 0).getTime() - 1* 60000)
+    // get time string 23:40:23, then get just the 23:40
+    // let randomDate = new Date(from.getTime() + Math.random() * (to.getTime() - from.getTime())).toTimeString().split(' ')[0].split(":");
+    // return 23:40
+    // return randomDate[0] + ':' + randomDate[1];
     return new Date(from.getTime() + Math.random() * (to.getTime() - from.getTime()));
   }
 
-  confirmUpdate(){
-    this.storage.set('lunch',this.lunchHour);
-    this.storage.set('dinner',this.dinnerHour);
-    this.storage.set('wake',this.wakeHour);
-    this.storage.set('sleep',this.sleepHour);
-    this.storage.set('breakHour',this.breakfastHour);
+  async confirmUpdate(){
+    const v1 = await this.storage.set('lunch',this.lunchHour);
+    const v2 = await this.storage.set('dinner',this.dinnerHour);
+    const v3 = await this.storage.set('wake',this.wakeHour);
+    const v4 = await this.storage.set('sleep',this.sleepHour);
+    const v5 = await this.storage.set('breakHour',this.breakfastHour);
 
     //seta novos schedules de notificacao
-    // this.setNewNotifications();
-    // this.presentAlert();
-    console.log(this.getRandomDate());
+    const settingNotif = await this.setNewNotifications();
+    this.presentAlert('Horários foram salvos.')
   }
 
   async setNewNotifications(){
-
-    await this.localNotifications.schedule({
-      id: 1,
-      text: 'Single ILocalNotification',
-      // sound: isAndroid? 'file://sound.mp3': 'file://beep.caf',
-      // data: { secret: key }
+    let clearAll = await this.localNotifications.clearAll();
+    let notifications = [];
+    let count = 0;
+   
+    let creating = await this.messages_no_restrictions.forEach((message, index) =>{
+      count = index + 1;
+      let randomDate = this.getRandomDate();
+      notifications.push({
+        id: index,
+        title: 'Dica',
+        text: message,
+        trigger: { every: { hour: randomDate.getHours(), minute: randomDate.getMinutes()}},
+        // actions: [
+        //   { id: 'yes', title: 'OK' },
+        //   { id: 'no',  title: 'No' }
+        // ]
+      });  
     });
-    // return await this.localNotifications.clearAll();
-    // clearAll
+
+    let lunchString = this.lunchHour.split(':');
+    let sleepString = this.sleepHour.split(':');
+    let today = new Date();
+    let lunchDate = new Date (new Date(today.getFullYear(), today.getMonth(), today.getDate(), parseInt(lunchString[0]), parseInt(lunchString[1]), 0).getTime() - 30 * 60000)
+    let sleepDate = new Date (new Date(today.getFullYear(), today.getMonth(), today.getDate(), parseInt(sleepString[0]), parseInt(sleepString[1]), 0).getTime() - 30 * 60000)
+
+    // 30 min before sleep
+    notifications.push({
+      id: count++,
+      title: 'Dica',
+      text: "Não durma com o queixo apoiado nas mãos.",
+      trigger: { every: { hour: sleepDate.getHours(), minute: sleepDate.getMinutes()}},
+      // actions: [
+      //   { id: 'yes', title: 'OK' },
+      //   { id: 'no',  title: 'No' }
+      // ]
+    })
+
+    // 30 min before lunch
+    notifications.push({
+      id: count++,
+      title: 'Dica',
+      text: "Evite alimentos duros na hora das refeições caso esteja com dor.",
+      trigger: { every: { hour: lunchDate.getHours(), minute: lunchDate.getMinutes()}},
+      // actions: [
+      //   { id: 'yes', title: 'OK' },
+      //   { id: 'no',  title: 'No' }
+      // ]
+    })
+
+    return await this.localNotifications.schedule(notifications);
   }
 
-  async presentAlert(){
+  async presentAlert(msg){
     let alert = await this.alertCtrl.create({
       header: 'Atualização.',
-      message: 'Horários foram salvos.',
+      message: msg,
       buttons: ['Ok']
     });
-  return await alert.present();
+    return await alert.present();
   }
 }
