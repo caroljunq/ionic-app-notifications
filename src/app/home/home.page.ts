@@ -16,6 +16,7 @@ export class HomePage {
   wakeHour: any = "00:00";
   sleepHour: any = "00:00";
   breakfastHour: any = "00:00";
+  teste = [];
 
   messages_no_restrictions = ["Evite manter os dentes encostados uns aos outros","Não esfregue os dentes uns aos outros","Evite morder seus lábios",
     "Não roa unhas", "Evite Mascar Chicletes","Evite apoiar a mão no queixo", "Evite Segurar o telefone nas orelhas com o ombro",
@@ -66,18 +67,45 @@ export class HomePage {
     });
   }
 
-  // Generate random data (hour minute) out of the range of wake-sleep hour
-  getRandomDate() {
+  getHoursBetween(notificationInterval){
     let wakeHour = this.wakeHour.split(':');
     let sleepHour = this.sleepHour.split(':');
     let today = new Date();
-    let from = new Date (new Date(today.getFullYear(), today.getMonth(), today.getDate(), parseInt(wakeHour[0]), parseInt(wakeHour[1]), 0).getTime() + 1* 60000)
-    let to =  new Date (new Date(today.getFullYear(), today.getMonth(), today.getDate(), parseInt(sleepHour[0]), parseInt(sleepHour[1]), 0).getTime() - 1* 60000)
-    // get time string 23:40:23, then get just the 23:40
-    // let randomDate = new Date(from.getTime() + Math.random() * (to.getTime() - from.getTime())).toTimeString().split(' ')[0].split(":");
-    // return 23:40
-    // return randomDate[0] + ':' + randomDate[1];
-    return new Date(from.getTime() + Math.random() * (to.getTime() - from.getTime()));
+    let wakeTime = new Date(today.getFullYear(), today.getMonth(), today.getDate(), parseInt(wakeHour[0]), parseInt(wakeHour[1]), 0).getTime()
+    let sleepTime = new Date(today.getFullYear(), today.getMonth(), today.getDate(), parseInt(sleepHour[0]), parseInt(sleepHour[1]), 0).getTime()
+
+    // interval in minutes
+    let minutesInterval = (sleepTime - wakeTime) / 60000;
+    // wake minuts, notifications can be displayed 
+    let availableMinutes = 0;
+    
+    if(minutesInterval < 0){
+      availableMinutes  = 1440 - (-minutesInterval);
+    }else{
+      availableMinutes  = minutesInterval;
+    }
+
+    //availableMinutes /interval between each notification
+    let numberNotifications = Math.floor(availableMinutes /notificationInterval);
+    let hours = [];
+
+    for (let index = 0; index < numberNotifications; index++) {
+      let newHour = new Date(wakeTime + notificationInterval * 60000 * (index + 1));
+      hours.push([newHour.getHours(),newHour.getMinutes()]);
+    }
+    return hours;
+  }
+
+  //shuffle array
+  shuffle(a) {
+    var j, x, i;
+    for (i = a.length - 1; i > 0; i--) {
+        j = Math.floor(Math.random() * (i + 1));
+        x = a[i];
+        a[i] = a[j];
+        a[j] = x;
+    }
+    return a;
   }
 
   async confirmUpdate(){
@@ -86,30 +114,43 @@ export class HomePage {
     const v3 = await this.storage.set('wake',this.wakeHour);
     const v4 = await this.storage.set('sleep',this.sleepHour);
     const v5 = await this.storage.set('breakHour',this.breakfastHour);
-
-    //seta novos schedules de notificacao
-    const settingNotif = await this.setNewNotifications();
-    this.presentAlert('Horários foram salvos.')
+    
+    let hours = this.getHoursBetween(90);
+    let randomMessages = this.shuffle(this.messages_no_restrictions);
+    const settingNotif = await this.setNewNotifications(hours, randomMessages);
+    this.presentAlert('Horários foram salvos.');
   }
 
-  async setNewNotifications(){
+
+  getRandomArbitrary(min, max) {
+    return Math.floor(Math.random() * (max - min) + min);
+  }
+  async setNewNotifications(hours, randomMessages){
     let clearAll = await this.localNotifications.clearAll();
     let notifications = [];
-    let count = 0;
-   
-    let creating = await this.messages_no_restrictions.forEach((message, index) =>{
-      count = index + 1;
-      let randomDate = this.getRandomDate();
+
+    let arraySize = hours.length < randomMessages.length ? hours.length : randomMessages.length;
+    
+    for(let i = 0; i < arraySize; i++){
       notifications.push({
-        id: index,
+        id: i,
         title: 'Dica',
-        text: message,
-        trigger: { every: { hour: randomDate.getHours(), minute: randomDate.getMinutes(), second: 1}, count: 1},
-        // actions: [
-        //   { id: 'ok', title: 'OK' },
-        // ]
-      });  
-    });
+        text: randomMessages[i],
+        trigger: { every: { hour: hours[i][0], minute: hours[i][1], second: 1}, count: 1},
+      });
+    }
+
+    //if there are more available hours than messages
+    if(hours.length > randomMessages.length){
+      for(let i = arraySize; i < hours.length; i++){
+        notifications.push({
+          id: i,
+          title: 'Dica',
+          text: randomMessages[this.getRandomArbitrary(0, randomMessages.length - 1)],
+          trigger: { every: { hour: hours[i][0], minute: hours[i][1], second: 1}, count: 1},
+        });
+      }
+    }
 
     let lunchString = this.lunchHour.split(':');
     let sleepString = this.sleepHour.split(':');
@@ -117,26 +158,21 @@ export class HomePage {
     let lunchDate = new Date (new Date(today.getFullYear(), today.getMonth(), today.getDate(), parseInt(lunchString[0]), parseInt(lunchString[1]), 0).getTime() - 30 * 60000)
     let sleepDate = new Date (new Date(today.getFullYear(), today.getMonth(), today.getDate(), parseInt(sleepString[0]), parseInt(sleepString[1]), 0).getTime() - 30 * 60000)
 
+    this.teste = notifications;
     // 30 min before sleep
     notifications.push({
-      id: count++,
+      id: arraySize + 1,
       title: 'Dica',
       text: "Não durma com o queixo apoiado nas mãos.",
       trigger: { every: { hour: sleepDate.getHours(), minute: sleepDate.getMinutes(), second: 1}, count: 1},
-      // actions: [
-      //   { id: 'ok', title: 'OK' },
-      // ]
     })
 
     // 30 min before lunch
     notifications.push({
-      id: count++,
+      id: arraySize + 2,
       title: 'Dica',
       text: "Evite alimentos duros na hora das refeições caso esteja com dor.",
       trigger: { every: { hour: lunchDate.getHours(), minute: lunchDate.getMinutes(), second: 1}, count: 1},
-      // actions: [
-      //   { id: 'ok', title: 'OK' },
-      // ]
     })
 
     return await this.localNotifications.schedule(notifications);
@@ -144,7 +180,6 @@ export class HomePage {
 
   async presentAlert(msg){
     let alert = await this.alertCtrl.create({
-      // header: 'Atualização',
       message: msg,
       buttons: ['Ok']
     });

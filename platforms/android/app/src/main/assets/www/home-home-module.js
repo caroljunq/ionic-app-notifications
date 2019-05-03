@@ -57,7 +57,7 @@ var HomePageModule = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<ion-header>\n  <ion-toolbar>\n    <ion-buttons slot=\"start\">\n      <ion-menu-button></ion-menu-button>\n    </ion-buttons>\n    <ion-title>\n      Início\n    </ion-title>\n  </ion-toolbar>\n</ion-header>\n\n<ion-content>\n  <span class=\"logo-line\">\n    <img id=\"logo\" src=\"/assets/logo.png\"/>\n  </span>\n    <span class=\"common-text\">Forneça os horários em que você costuma:</span>\n    <ion-item>\n      <ion-icon name=\"bed\" slot=\"start\"></ion-icon>\n      <ion-label>Dormir</ion-label>\n      <ion-datetime displayFormat=\"HH:mm\" [(ngModel)]=\"sleepHour\"></ion-datetime>\n      <!-- <ion-icon name=\"settings\" slot=\"end\"></ion-icon> -->\n    </ion-item>\n    <ion-item>\n      <ion-icon name=\"sunny\" slot=\"start\"></ion-icon>\n      <ion-label>Acordar</ion-label>\n      <ion-datetime displayFormat=\"HH:mm\" [(ngModel)]=\"wakeHour\"></ion-datetime>\n      <!-- <ion-icon name=\"settings\" slot=\"end\"></ion-icon> -->\n    </ion-item>\n    <ion-item>\n      <ion-icon name=\"cafe\" slot=\"start\"></ion-icon>\n      <ion-label>Café da Manhã</ion-label>\n      <ion-datetime displayFormat=\"HH:mm\" [(ngModel)]=\"breakfastHour\"></ion-datetime>\n      <!-- <ion-icon name=\"settings\" slot=\"end\"></ion-icon> -->\n    </ion-item>\n    <ion-item>\n      <ion-icon name=\"restaurant\" slot=\"start\"></ion-icon>\n      <ion-label>Almoço</ion-label>\n      <ion-datetime displayFormat=\"HH:mm\" [(ngModel)]=\"lunchHour\"></ion-datetime>\n      <!-- <ion-icon name=\"settings\" slot=\"end\"></ion-icon> -->\n    </ion-item>\n    <ion-item>\n      <ion-icon name=\"pint\" slot=\"start\"></ion-icon>\n      <ion-label>Jantar</ion-label>\n      <ion-datetime displayFormat=\"HH:mm\" [(ngModel)]=\"dinnerHour\"></ion-datetime>\n      <!-- <ion-icon name=\"settings\" slot=\"end\"></ion-icon> -->\n    </ion-item>\n    <ion-row justify-content-center class=\"button-update\" (click)=\"confirmUpdate()\">\n      <ion-button shape=\"round\">\n        <ion-icon name=\"checkmark\" slot=\"icon-only\"></ion-icon>\n      </ion-button>\n    </ion-row>\n</ion-content>\n"
+module.exports = "<ion-header>\n  <ion-toolbar>\n    <ion-buttons slot=\"start\">\n      <ion-menu-button></ion-menu-button>\n    </ion-buttons>\n    <ion-title>\n      Início\n    </ion-title>\n  </ion-toolbar>\n</ion-header>\n\n<ion-content>\n  <span class=\"logo-line\">\n    <img id=\"logo\" src=\"/assets/logo.png\"/>\n  </span>\n    <span class=\"common-text\">Forneça os horários em que você costuma:</span>\n    <ion-item>\n      <ion-icon name=\"bed\" slot=\"start\"></ion-icon>\n      <ion-label>Dormir</ion-label>\n      <ion-datetime displayFormat=\"HH:mm\" [(ngModel)]=\"sleepHour\"></ion-datetime>\n      <!-- <ion-icon name=\"settings\" slot=\"end\"></ion-icon> -->\n    </ion-item>\n    <ion-item>\n      <ion-icon name=\"sunny\" slot=\"start\"></ion-icon>\n      <ion-label>Acordar</ion-label>\n      <ion-datetime displayFormat=\"HH:mm\" [(ngModel)]=\"wakeHour\"></ion-datetime>\n      <!-- <ion-icon name=\"settings\" slot=\"end\"></ion-icon> -->\n    </ion-item>\n    <ion-item>\n      <ion-icon name=\"cafe\" slot=\"start\"></ion-icon>\n      <ion-label>Café da Manhã</ion-label>\n      <ion-datetime displayFormat=\"HH:mm\" [(ngModel)]=\"breakfastHour\"></ion-datetime>\n      <!-- <ion-icon name=\"settings\" slot=\"end\"></ion-icon> -->\n    </ion-item>\n    <ion-item>\n      <ion-icon name=\"restaurant\" slot=\"start\"></ion-icon>\n      <ion-label>Almoço</ion-label>\n      <ion-datetime displayFormat=\"HH:mm\" [(ngModel)]=\"lunchHour\"></ion-datetime>\n      <!-- <ion-icon name=\"settings\" slot=\"end\"></ion-icon> -->\n    </ion-item>\n    <ion-item>\n      <ion-icon name=\"pint\" slot=\"start\"></ion-icon>\n      <ion-label>Jantar</ion-label>\n      <ion-datetime displayFormat=\"HH:mm\" [(ngModel)]=\"dinnerHour\"></ion-datetime>\n      <!-- <ion-icon name=\"settings\" slot=\"end\"></ion-icon> -->\n    </ion-item>\n    <ion-row justify-content-center class=\"button-update\" (click)=\"confirmUpdate()\">\n      <ion-button shape=\"round\">\n        <ion-icon name=\"checkmark\" slot=\"icon-only\"></ion-icon>\n      </ion-button>\n    </ion-row>\n    <ion-list>\n      <ion-item *ngFor=\"let t of teste\">\n        <p>{{t.text}}</p>\n        <p>{{t.trigger.every.hour}}:{{t.trigger.every.minute}}</p>\n      </ion-item>\n    </ion-list>\n</ion-content>\n"
 
 /***/ }),
 
@@ -106,6 +106,7 @@ var HomePage = /** @class */ (function () {
         this.wakeHour = "00:00";
         this.sleepHour = "00:00";
         this.breakfastHour = "00:00";
+        this.teste = [];
         this.messages_no_restrictions = ["Evite manter os dentes encostados uns aos outros", "Não esfregue os dentes uns aos outros", "Evite morder seus lábios",
             "Não roa unhas", "Evite Mascar Chicletes", "Evite apoiar a mão no queixo", "Evite Segurar o telefone nas orelhas com o ombro",
             "Evite morder canetas, alfinetes, ou abrir coisas com os dentes", "Não chupe o próprio dedo ou chupeta",
@@ -143,22 +144,45 @@ var HomePage = /** @class */ (function () {
             }
         });
     }
-    // Generate random data (hour minute) out of the range of wake-sleep hour
-    HomePage.prototype.getRandomDate = function () {
+    HomePage.prototype.getHoursBetween = function (notificationInterval) {
         var wakeHour = this.wakeHour.split(':');
         var sleepHour = this.sleepHour.split(':');
         var today = new Date();
-        var from = new Date(new Date(today.getFullYear(), today.getMonth(), today.getDate(), parseInt(wakeHour[0]), parseInt(wakeHour[1]), 0).getTime() + 1 * 60000);
-        var to = new Date(new Date(today.getFullYear(), today.getMonth(), today.getDate(), parseInt(sleepHour[0]), parseInt(sleepHour[1]), 0).getTime() - 1 * 60000);
-        // get time string 23:40:23, then get just the 23:40
-        // let randomDate = new Date(from.getTime() + Math.random() * (to.getTime() - from.getTime())).toTimeString().split(' ')[0].split(":");
-        // return 23:40
-        // return randomDate[0] + ':' + randomDate[1];
-        return new Date(from.getTime() + Math.random() * (to.getTime() - from.getTime()));
+        var wakeTime = new Date(today.getFullYear(), today.getMonth(), today.getDate(), parseInt(wakeHour[0]), parseInt(wakeHour[1]), 0).getTime();
+        var sleepTime = new Date(today.getFullYear(), today.getMonth(), today.getDate(), parseInt(sleepHour[0]), parseInt(sleepHour[1]), 0).getTime();
+        // interval in minutes
+        var minutesInterval = (sleepTime - wakeTime) / 60000;
+        // wake minuts, notifications can be displayed 
+        var availableMinutes = 0;
+        if (minutesInterval < 0) {
+            availableMinutes = 1440 - (-minutesInterval);
+        }
+        else {
+            availableMinutes = minutesInterval;
+        }
+        //availableMinutes /interval between each notification
+        var numberNotifications = Math.floor(availableMinutes / notificationInterval);
+        var hours = [];
+        for (var index = 0; index < numberNotifications; index++) {
+            var newHour = new Date(wakeTime + notificationInterval * 60000 * (index + 1));
+            hours.push([newHour.getHours(), newHour.getMinutes()]);
+        }
+        return hours;
+    };
+    //shuffle array
+    HomePage.prototype.shuffle = function (a) {
+        var j, x, i;
+        for (i = a.length - 1; i > 0; i--) {
+            j = Math.floor(Math.random() * (i + 1));
+            x = a[i];
+            a[i] = a[j];
+            a[j] = x;
+        }
+        return a;
     };
     HomePage.prototype.confirmUpdate = function () {
         return tslib__WEBPACK_IMPORTED_MODULE_0__["__awaiter"](this, void 0, void 0, function () {
-            var v1, v2, v3, v4, v5, settingNotif;
+            var v1, v2, v3, v4, v5, hours, randomMessages, settingNotif;
             return tslib__WEBPACK_IMPORTED_MODULE_0__["__generator"](this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.storage.set('lunch', this.lunchHour)];
@@ -176,7 +200,9 @@ var HomePage = /** @class */ (function () {
                         return [4 /*yield*/, this.storage.set('breakHour', this.breakfastHour)];
                     case 5:
                         v5 = _a.sent();
-                        return [4 /*yield*/, this.setNewNotifications()];
+                        hours = this.getHoursBetween(90);
+                        randomMessages = this.shuffle(this.messages_no_restrictions);
+                        return [4 /*yield*/, this.setNewNotifications(hours, randomMessages)];
                     case 6:
                         settingNotif = _a.sent();
                         this.presentAlert('Horários foram salvos.');
@@ -185,50 +211,60 @@ var HomePage = /** @class */ (function () {
             });
         });
     };
-    HomePage.prototype.setNewNotifications = function () {
+    HomePage.prototype.getRandomArbitrary = function (min, max) {
+        return Math.floor(Math.random() * (max - min) + min);
+    };
+    HomePage.prototype.setNewNotifications = function (hours, randomMessages) {
         return tslib__WEBPACK_IMPORTED_MODULE_0__["__awaiter"](this, void 0, void 0, function () {
-            var clearAll, notifications, count, creating, lunchString, sleepString, today, lunchDate, sleepDate;
-            var _this = this;
+            var clearAll, notifications, arraySize, i, i, lunchString, sleepString, today, lunchDate, sleepDate;
             return tslib__WEBPACK_IMPORTED_MODULE_0__["__generator"](this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.localNotifications.clearAll()];
                     case 1:
                         clearAll = _a.sent();
                         notifications = [];
-                        count = 0;
-                        return [4 /*yield*/, this.messages_no_restrictions.forEach(function (message, index) {
-                                count = index + 1;
-                                var randomDate = _this.getRandomDate();
+                        arraySize = hours.length < randomMessages.length ? hours.length : randomMessages.length;
+                        for (i = 0; i < arraySize; i++) {
+                            notifications.push({
+                                id: i,
+                                title: 'Dica',
+                                text: randomMessages[i],
+                                trigger: { every: { hour: hours[i][0], minute: hours[i][1], second: 1 }, count: 1 },
+                            });
+                        }
+                        //if there are more available hours than messages
+                        if (hours.length > randomMessages.length) {
+                            for (i = arraySize; i < hours.length; i++) {
                                 notifications.push({
-                                    id: index,
+                                    id: i,
                                     title: 'Dica',
-                                    text: message,
-                                    trigger: { every: { hour: randomDate.getHours(), minute: randomDate.getMinutes(), second: 1 }, count: 1 },
+                                    text: randomMessages[this.getRandomArbitrary(0, randomMessages.length - 1)],
+                                    trigger: { every: { hour: hours[i][0], minute: hours[i][1], second: 1 }, count: 1 },
                                 });
-                            })];
-                    case 2:
-                        creating = _a.sent();
+                            }
+                        }
                         lunchString = this.lunchHour.split(':');
                         sleepString = this.sleepHour.split(':');
                         today = new Date();
                         lunchDate = new Date(new Date(today.getFullYear(), today.getMonth(), today.getDate(), parseInt(lunchString[0]), parseInt(lunchString[1]), 0).getTime() - 30 * 60000);
                         sleepDate = new Date(new Date(today.getFullYear(), today.getMonth(), today.getDate(), parseInt(sleepString[0]), parseInt(sleepString[1]), 0).getTime() - 30 * 60000);
+                        this.teste = notifications;
                         // 30 min before sleep
                         notifications.push({
-                            id: count++,
+                            id: arraySize + 1,
                             title: 'Dica',
                             text: "Não durma com o queixo apoiado nas mãos.",
                             trigger: { every: { hour: sleepDate.getHours(), minute: sleepDate.getMinutes(), second: 1 }, count: 1 },
                         });
                         // 30 min before lunch
                         notifications.push({
-                            id: count++,
+                            id: arraySize + 2,
                             title: 'Dica',
                             text: "Evite alimentos duros na hora das refeições caso esteja com dor.",
                             trigger: { every: { hour: lunchDate.getHours(), minute: lunchDate.getMinutes(), second: 1 }, count: 1 },
                         });
                         return [4 /*yield*/, this.localNotifications.schedule(notifications)];
-                    case 3: return [2 /*return*/, _a.sent()];
+                    case 2: return [2 /*return*/, _a.sent()];
                 }
             });
         });
@@ -239,7 +275,6 @@ var HomePage = /** @class */ (function () {
             return tslib__WEBPACK_IMPORTED_MODULE_0__["__generator"](this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.alertCtrl.create({
-                            // header: 'Atualização',
                             message: msg,
                             buttons: ['Ok']
                         })];
