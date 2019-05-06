@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { Storage } from '@ionic/storage';
 import { Router } from '@angular/router';
 import { AlertController } from '@ionic/angular';
-import { LocalNotifications, ELocalNotificationTriggerUnit } from '@ionic-native/local-notifications/ngx';
+import { LocalNotifications } from '@ionic-native/local-notifications/ngx';
 
 @Component({
   selector: 'app-home',
@@ -17,6 +17,7 @@ export class HomePage {
   sleepHour: any = "00:00";
   breakfastHour: any = "00:00";
   teste = [];
+  eita: any;
 
   messages_no_restrictions = ["Evite manter os dentes encostados uns aos outros","Não esfregue os dentes uns aos outros","Evite morder seus lábios",
     "Não roa unhas", "Evite Mascar Chicletes","Evite apoiar a mão no queixo", "Evite Segurar o telefone nas orelhas com o ombro",
@@ -122,11 +123,11 @@ export class HomePage {
   }
 
 
-  getRandomArbitrary(min, max) {
+  getRandomArbitrary(min: number, max: number) {
     return Math.floor(Math.random() * (max - min) + min);
   }
-  async setNewNotifications(hours, randomMessages){
-    let clearAll = await this.localNotifications.clearAll();
+
+  async setNewNotifications(hours: Array<number>, randomMessages: Array<string>){
     let notifications = [];
 
     let arraySize = hours.length < randomMessages.length ? hours.length : randomMessages.length;
@@ -137,44 +138,47 @@ export class HomePage {
         title: 'Dica',
         text: randomMessages[i],
         trigger: { 
-          every: { hour: hours[i][0], minute: hours[i][1], second: 1}, count: 365},
+          every: { hour: hours[i][0], minute: hours[i][1], second: 1}},
       });
     }
 
     //if there are more available hours than messages
-    if(hours.length > randomMessages.length){
-      for(let i = arraySize; i < hours.length; i++){
-        notifications.push({
-          id: i,
-          title: 'Dica',
-          text: randomMessages[this.getRandomArbitrary(0, randomMessages.length - 1)],
-          trigger: { every: { hour: hours[i][0], minute: hours[i][1], second: 1}, count: 365},
-        });
-      }
+    
+    for(let i = arraySize; i < 16; i++){
+      notifications.push({
+        id: i,
+        title: 'Dica',
+        text: randomMessages[this.getRandomArbitrary(0, randomMessages.length - 1)],
+        trigger: { every: { hour: hours[this.getRandomArbitrary(0, hours.length - 1)][0], minute: hours[this.getRandomArbitrary(0, hours.length - 1)][1], second: 1}},
+      })
     }
+    
 
     let lunchString = this.lunchHour.split(':');
     let sleepString = this.sleepHour.split(':');
     let today = new Date();
     let lunchDate = new Date (new Date(today.getFullYear(), today.getMonth(), today.getDate(), parseInt(lunchString[0]), parseInt(lunchString[1]), 0).getTime() - 30 * 60000)
     let sleepDate = new Date (new Date(today.getFullYear(), today.getMonth(), today.getDate(), parseInt(sleepString[0]), parseInt(sleepString[1]), 0).getTime() - 30 * 60000)
-
-    this.teste = notifications;
+    this.eita = lunchDate
     // 30 min before sleep
     notifications.push({
-      id: arraySize + 1,
+      id: 16,
       title: 'Dica',
       text: "Não durma com o queixo apoiado nas mãos.",
-      trigger: { every: { hour: sleepDate.getHours(), minute: sleepDate.getMinutes(), second: 1}, count: 365},
+      // at: lunchDate,
+      trigger: { every: { hour: sleepDate.getHours(), minute: sleepDate.getMinutes(), second: 1}},
+      every: 'day'
     })
 
     // 30 min before lunch
     notifications.push({
-      id: arraySize + 2,
+      id: 17,
       title: 'Dica',
       text: "Evite alimentos duros na hora das refeições caso esteja com dor.",
-      trigger: { every: { hour: lunchDate.getHours(), minute: lunchDate.getMinutes(), second: 1}, count: 365},
+      trigger: { every: { hour: lunchDate.getHours(), minute: lunchDate.getMinutes(), second: 1}},
     })
+
+    this.teste = notifications;
 
     return await this.localNotifications.schedule(notifications);
   }
@@ -185,5 +189,15 @@ export class HomePage {
       buttons: ['Ok']
     });
     return await alert.present();
+  }
+
+  limpatudo(){
+    console.group("netri")
+    this.localNotifications.getAllScheduled()
+      .then((el) =>{
+        this.presentAlert("acabouu")
+        this.eita = el;
+      })
+    // this.localNotifications.cancelAll();
   }
 }

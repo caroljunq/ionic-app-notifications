@@ -51,8 +51,11 @@
     </ion-row>
     <ion-list>
       <ion-item *ngFor="let t of teste">
+        <p>{{t.id}}</p>
         <p>{{t.text}}</p>
         <p>{{t.trigger.every.hour}}:{{t.trigger.every.minute}}</p>
       </ion-item>
     </ion-list>
+    <ion-button (click)="limpatudo()">APAGARR TUTO</ion-button>
+    <div>{{eita}}</div>
 </ion-content>
